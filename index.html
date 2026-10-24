@@ -9,53 +9,68 @@
     body {
       font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       background: linear-gradient(180deg, #fff6d6 0%, #ffe0ec 100%);
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px;
+      padding: 10px 12px;
       user-select: none;
+      overflow: hidden;
     }
-    h1 { font-size: 2rem; color: #8a5a2b; margin-bottom: 8px; }
-    .count { font-size: 1.2rem; color: #a0704a; margin-bottom: 20px; }
+    .header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+    h1 { font-size: 1.35rem; color: #8a5a2b; }
+    .count { font-size: 1rem; color: #a0704a; font-weight: bold; }
 
-    .board {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      background: #fff;
-      padding: 18px;
-      border-radius: 24px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 480px;
-    }
     .main {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 8px;
       width: 100%;
-      max-width: 1000px;
+      max-width: 480px;
+      flex: 1;
+      min-height: 0;
     }
-    .main { flex-direction: column; }
-    .main > .princess-card { order: -1; max-width: 900px; }
-    .main > .board { max-width: 600px; }
     .princess-card {
+      order: -1;
       background: #fff;
-      border-radius: 24px;
+      border-radius: 20px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      padding: 12px;
+      padding: 8px;
       width: 100%;
-      max-width: 400px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
       text-align: center;
     }
-    #princessImg, #princessImgNext { width: 100%; height: auto; display: block; border-radius: 16px; }
-    .princess-stage { position: relative; }
-    #princessImgNext {
+    .princess-stage {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #2b194d;
+    }
+    #princessImg, #princessImgNext {
       position: absolute;
       inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      border-radius: 14px;
+    }
+    #princessImgNext {
       opacity: 0;
       pointer-events: none;
     }
@@ -77,28 +92,42 @@
       100% { transform: translate(-50%, -50%) scale(2.2) rotate(180deg); opacity: 0; }
     }
     .princess-msg {
-      font-size: 1.15rem;
+      font-size: 0.98rem;
       font-weight: bold;
       color: #9561c4;
-      min-height: 1.6em;
-      margin-top: 4px;
+      min-height: 1.4em;
+      margin-top: 6px;
+      flex-shrink: 0;
     }
 
+    /* 하단 작게 10개 표시되는 도장판 */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 4px;
+      background: #fff;
+      padding: 6px 8px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      width: 100%;
+      flex-shrink: 0;
+    }
     .slot {
       aspect-ratio: 1;
-      border: 3px dashed #f3c27a;
+      min-width: 0;
+      border: 1.5px dashed #f3c27a;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 0.7rem;
       color: #e0b884;
       font-weight: bold;
     }
     .slot.stamped {
-      border: 3px solid #ff8fab;
+      border: 1.5px solid #ff8fab;
       background: #fff0f5;
-      font-size: 2.2rem;
+      font-size: 1rem;
       animation: pop 0.4s ease-out;
     }
     @keyframes pop {
@@ -108,27 +137,31 @@
     }
 
     .stamp-btn {
-      margin-top: 28px;
-      font-size: 1.8rem;
-      padding: 20px 40px;
+      margin-top: 8px;
+      width: 100%;
+      max-width: 480px;
+      font-size: 1.35rem;
+      padding: 12px 24px;
       border: none;
       border-radius: 50px;
       background: #ff8fab;
       color: #fff;
       font-weight: bold;
-      box-shadow: 0 6px 0 #e06b8a;
+      box-shadow: 0 4px 0 #e06b8a;
       cursor: pointer;
+      flex-shrink: 0;
     }
-    .stamp-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #e06b8a; }
+    .stamp-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #e06b8a; }
 
     .reset-btn {
-      margin-top: 30px;
+      margin-top: 6px;
       background: none;
       border: none;
       color: #b89a80;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       text-decoration: underline;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     /* 보상 / 룰렛 공통 오버레이 */
@@ -177,8 +210,8 @@
     }
     .finale-frame {
       position: relative;
-      width: min(96vw, 1200px);
-      aspect-ratio: 1376 / 768;
+      width: min(92vw, 440px);
+      height: min(74dvh, 580px);
       overflow: hidden;
       border-radius: 20px;
       border: 6px solid #fff;
@@ -189,6 +222,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center center;
       display: block;
     }
     .finale.show .finale-frame img { animation: kenburns 5s ease-in-out forwards, sway 1.6s ease-in-out infinite; }
@@ -277,8 +311,10 @@
   </style>
 </head>
 <body>
-  <h1>💩 응가 도장판 💩</h1>
-  <div class="count" id="count">0 / 10</div>
+  <div class="header">
+    <h1>💩 응가 도장판 💩</h1>
+    <div class="count" id="count">0 / 10</div>
+  </div>
 
   <div class="main">
     <div class="board" id="board"></div>
