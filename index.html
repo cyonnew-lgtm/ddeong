@@ -322,7 +322,7 @@
     <!-- 공주 꾸미기 -->
     <div class="princess-card">
       <div class="princess-stage" id="princessStage">
-        <img id="princessImg" src="images/stage0.jpg" alt="공주와 유니콘" />
+        <img id="princessImg" src="images/1-0.jpg" alt="공주와 유니콘" />
         <img id="princessImgNext" alt="" />
         <div class="sparkle-burst" id="sparkleBurst">✨</div>
       </div>
@@ -337,7 +337,7 @@
   <div class="overlay finale" id="finale">
     <div class="finale-title">🎉 공주님 완성! 🎉</div>
     <div class="finale-frame">
-      <img src="images/stage10.jpg" alt="완성된 공주와 유니콘" />
+      <img id="finaleImg" src="images/1-10.jpg" alt="완성된 공주와 유니콘" />
       <div class="shine"></div>
       <div id="finaleSparkles"></div>
     </div>
@@ -362,7 +362,9 @@
 
   <script>
     const GOAL = 10;
+    const SETS = [1, 3];
     const STORAGE_KEY = "poopStampCount";
+    const SET_KEY = "poopSetIndex";
 
     // 룰렛 보상 목록
     const PRIZES = [
@@ -381,12 +383,16 @@
     const resultEl = document.getElementById("result");
     const spinBtn = document.getElementById("spinBtn");
     const newBoardBtn = document.getElementById("newBoardBtn");
+    const finaleImg = document.getElementById("finaleImg");
 
-    // 저장된 도장 개수 불러오기
+    // 저장된 도장 개수 및 현재 세트 순서 불러오기
     let count = Number(localStorage.getItem(STORAGE_KEY)) || 0;
+    let setIndex = Number(localStorage.getItem(SET_KEY)) || 0;
+    if (setIndex < 0 || setIndex >= SETS.length) setIndex = 0;
 
     function save() {
       localStorage.setItem(STORAGE_KEY, count);
+      localStorage.setItem(SET_KEY, setIndex);
     }
 
     function render(animateIndex = -1) {
@@ -423,8 +429,11 @@
     ];
 
     // 단계별 그림 미리 불러오기
-    const stageSrc = (n) => `images/stage${n}.jpg`;
-    for (let i = 0; i <= GOAL; i++) new Image().src = stageSrc(i);
+    const stageSrc = (n) => `images/${SETS[setIndex]}-${n}.jpg`;
+    function preloadSet() {
+      for (let i = 0; i <= GOAL; i++) new Image().src = stageSrc(i);
+    }
+    preloadSet();
 
     const princessImg = document.getElementById("princessImg");
     const princessImgNext = document.getElementById("princessImgNext");
@@ -433,6 +442,7 @@
     function renderPrincess(newStep = 0) {
       const stage = Math.min(count, GOAL);
       document.getElementById("princessMsg").textContent = PRINCESS_MSGS[stage];
+      finaleImg.src = stageSrc(GOAL);
 
       if (newStep > 0 && newStep === stage) {
         // 새 그림이 서서히 나타나며 반짝!
@@ -458,6 +468,7 @@
     // 완성 그림을 5초 동안 크게 보여준 뒤 선물 창 띄우기
     const FINALE_MS = 5000;
     function showFinale() {
+      finaleImg.src = stageSrc(GOAL);
       const finaleEl = document.getElementById("finale");
       const box = document.getElementById("finaleSparkles");
       box.innerHTML = "";
@@ -583,7 +594,9 @@
 
     newBoardBtn.addEventListener("click", () => {
       count = 0;
+      setIndex = (setIndex + 1) % SETS.length;
       save();
+      preloadSet();
       render();
       rouletteEl.classList.remove("show");
     });
