@@ -309,6 +309,30 @@
       animation: pop 0.5s ease-out;
       color: #ffd166 !important;
     }
+    .close-overlay-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      background: rgba(255, 255, 255, 0.25) !important;
+      color: #fff !important;
+      font-size: 1.4rem !important;
+      box-shadow: none !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sub-close-btn {
+      margin-top: 12px;
+      font-size: 1.05rem !important;
+      padding: 10px 26px !important;
+      background: rgba(255, 255, 255, 0.22) !important;
+      color: #fff !important;
+      box-shadow: none !important;
+    }
   </style>
 </head>
 <body>
@@ -352,6 +376,7 @@
 
   <!-- 2단계: 룰렛 -->
   <div class="overlay" id="roulette">
+    <button class="close-overlay-btn" id="closeRouletteX" aria-label="룰렛 닫기">✕</button>
     <div class="wheel-wrap">
       <div class="pointer"></div>
       <canvas id="wheel" width="600" height="600"></canvas>
@@ -359,6 +384,7 @@
     <p class="result" id="result">룰렛을 돌려보세요!</p>
     <button id="spinBtn">돌려라! 🎡</button>
     <button id="newBoardBtn" style="display:none">새 도장판 시작하기</button>
+    <button class="sub-close-btn" id="closeRouletteBtn">닫기</button>
   </div>
 
   <script>
@@ -592,6 +618,12 @@
 
     document.getElementById("giftBtn").addEventListener("click", openRoulette);
     spinBtn.addEventListener("click", spin);
+
+    function closeRoulette() {
+      rouletteEl.classList.remove("show");
+    }
+    document.getElementById("closeRouletteX").addEventListener("click", closeRoulette);
+    document.getElementById("closeRouletteBtn").addEventListener("click", closeRoulette);
 
     newBoardBtn.addEventListener("click", () => {
       count = 0;
