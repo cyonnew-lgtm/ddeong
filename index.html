@@ -153,6 +153,29 @@
     }
     .stamp-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #e06b8a; }
 
+    .gift-bar-btn {
+      margin-top: 6px;
+      width: 100%;
+      max-width: 480px;
+      font-size: 1.3rem;
+      padding: 10px 24px;
+      border: 2px solid #fff;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #ffd166 0%, #ff9ec7 100%);
+      color: #6b2d5c;
+      font-weight: bold;
+      box-shadow: 0 4px 0 #d9829b, 0 0 18px rgba(255, 158, 199, 0.8);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: none;
+      animation: giftPulse 1.1s ease-in-out infinite;
+    }
+    .gift-bar-btn.show { display: block; }
+    @keyframes giftPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
     .reset-btn {
       margin-top: 4px;
       background: none;
@@ -350,31 +373,17 @@
         <img id="princessImg" src="images/1-0.jpg" alt="공주와 유니콘" />
         <img id="princessImgNext" alt="" />
         <div class="sparkle-burst" id="sparkleBurst">✨</div>
+        <div id="stageSparkles"></div>
       </div>
       <div class="princess-msg" id="princessMsg"></div>
     </div>
   </div>
 
   <button class="stamp-btn" id="stampBtn">응가 했어요! 💩</button>
+  <button class="gift-bar-btn" id="giftBarBtn">🎁 선물 상자 열기! (룰렛)</button>
   <button class="reset-btn" id="resetBtn">처음부터 다시하기</button>
 
-  <!-- 0단계: 완성 그림 크게 보여주기 -->
-  <div class="overlay finale" id="finale">
-    <div class="finale-title">🎉 공주님 완성! 🎉</div>
-    <div class="finale-frame">
-      <img id="finaleImg" src="images/1-10.jpg" alt="완성된 공주와 유니콘" />
-      <div class="shine"></div>
-      <div id="finaleSparkles"></div>
-    </div>
-  </div>
-
-  <!-- 1단계: 선물 -->
-  <div class="overlay" id="reward">
-    <button class="gift" id="giftBtn">🎁</button>
-    <p>도장 10개 완성! 🎉<br />선물을 눌러보세요!</p>
-  </div>
-
-  <!-- 2단계: 룰렛 -->
+  <!-- 룰렛 -->
   <div class="overlay" id="roulette">
     <button class="close-overlay-btn" id="closeRouletteX" aria-label="룰렛 닫기">✕</button>
     <div class="wheel-wrap">
@@ -404,13 +413,14 @@
 
     const boardEl = document.getElementById("board");
     const countEl = document.getElementById("count");
-    const rewardEl = document.getElementById("reward");
     const rouletteEl = document.getElementById("roulette");
     const wheelEl = document.getElementById("wheel");
     const resultEl = document.getElementById("result");
     const spinBtn = document.getElementById("spinBtn");
     const newBoardBtn = document.getElementById("newBoardBtn");
-    const finaleImg = document.getElementById("finaleImg");
+    const stampBtn = document.getElementById("stampBtn");
+    const giftBarBtn = document.getElementById("giftBarBtn");
+    const stageSparkles = document.getElementById("stageSparkles");
 
     // 저장된 도장 개수 및 현재 세트 순서 불러오기
     let count = Number(localStorage.getItem(STORAGE_KEY)) || 0;
@@ -438,6 +448,35 @@
       }
       countEl.textContent = `${count} / ${GOAL}`;
       renderPrincess(animateIndex + 1);
+      updateBottomButtons();
+    }
+
+    function updateBottomButtons() {
+      if (count >= GOAL) {
+        stampBtn.style.display = "none";
+        giftBarBtn.classList.add("show");
+        renderStageSparkles(true);
+      } else {
+        stampBtn.style.display = "";
+        giftBarBtn.classList.remove("show");
+        renderStageSparkles(false);
+      }
+    }
+
+    function renderStageSparkles(active) {
+      stageSparkles.innerHTML = "";
+      if (!active) return;
+      const icons = ["✨", "💖", "⭐", "🌟", "💜", "🦄"];
+      for (let i = 0; i < 16; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.textContent = icons[i % icons.length];
+        s.style.left = 5 + Math.random() * 88 + "%";
+        s.style.top = 5 + Math.random() * 85 + "%";
+        s.style.fontSize = 1.0 + Math.random() * 1.3 + "rem";
+        s.style.animationDelay = Math.random() * 1.4 + "s";
+        stageSparkles.appendChild(s);
+      }
     }
 
     // ===== 공주 꾸미기 =====
@@ -469,7 +508,6 @@
     function renderPrincess(newStep = 0) {
       const stage = Math.min(count, GOAL);
       document.getElementById("princessMsg").textContent = PRINCESS_MSGS[stage];
-      finaleImg.src = stageSrc(GOAL);
 
       if (newStep > 0 && newStep === stage) {
         // 새 그림이 서서히 나타나며 반짝!
@@ -486,35 +524,6 @@
       } else {
         princessImg.src = stageSrc(stage);
       }
-    }
-
-    function showReward() {
-      rewardEl.classList.add("show");
-    }
-
-    // 완성 그림을 5초 동안 크게 보여준 뒤 선물 창 띄우기
-    const FINALE_MS = 5000;
-    function showFinale() {
-      finaleImg.src = stageSrc(GOAL);
-      const finaleEl = document.getElementById("finale");
-      const box = document.getElementById("finaleSparkles");
-      box.innerHTML = "";
-      const icons = ["✨", "💖", "⭐", "🌟", "💜", "🦄"];
-      for (let i = 0; i < 24; i++) {
-        const s = document.createElement("div");
-        s.className = "sparkle";
-        s.textContent = icons[i % icons.length];
-        s.style.left = Math.random() * 95 + "%";
-        s.style.top = Math.random() * 90 + "%";
-        s.style.fontSize = 1.2 + Math.random() * 1.8 + "rem";
-        s.style.animationDelay = Math.random() * 1.4 + "s";
-        box.appendChild(s);
-      }
-      finaleEl.classList.add("show");
-      setTimeout(() => {
-        finaleEl.classList.remove("show");
-        showReward();
-      }, FINALE_MS);
     }
 
     // ===== 룰렛 =====
@@ -571,7 +580,6 @@
     }
 
     function openRoulette() {
-      rewardEl.classList.remove("show");
       rouletteEl.classList.add("show");
       resultEl.textContent = "룰렛을 돌려보세요!";
       resultEl.classList.remove("win");
@@ -605,18 +613,14 @@
     }
 
     // ===== 이벤트 =====
-    document.getElementById("stampBtn").addEventListener("click", () => {
-      if (count >= GOAL) {
-        showReward();
-        return;
-      }
+    stampBtn.addEventListener("click", () => {
+      if (count >= GOAL) return;
       count++;
       save();
       render(count - 1);
-      if (count === GOAL) setTimeout(showFinale, 1400);
     });
 
-    document.getElementById("giftBtn").addEventListener("click", openRoulette);
+    giftBarBtn.addEventListener("click", openRoulette);
     spinBtn.addEventListener("click", spin);
 
     function closeRoulette() {
@@ -644,7 +648,6 @@
 
     drawWheel();
     render();
-    if (count >= GOAL) showReward();
   </script>
 </body>
 </html>
